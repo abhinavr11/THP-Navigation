@@ -1,0 +1,30 @@
+<launch>
+  
+  <arg name="x_pos" default="-0.5"/>
+  <arg name="y_pos" default="-0.5"/>
+  <arg name="z_pos" default="2.0"/>
+  <arg name="map_file" default="$(find darwin_gazebo)/maps/map.yaml"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_world.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+ <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
+
+ <param name="robot_description" textfile="$(find darwin_description)/urdf/darwin.urdf" />  
+ 
+ <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find darwin_description)/urdf/darwin.urdf -urdf -model darwin -z 0.3817 -x 5.0" />
+
+ <include file="$(find darwin_control)/launch/darwin_control.launch"/>
+
+  <node name="darwin_walker" pkg="darwin_gazebo" type="walker.py" />
+
+<include file="$(find darwin_gazebo)/launch/amcl.launch"/>
+
+
+</launch>
